@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project Template.
+This is a Icicle-Bubble experiment with react, Inspiring by @edankwan
 
 ## Getting Started
 
