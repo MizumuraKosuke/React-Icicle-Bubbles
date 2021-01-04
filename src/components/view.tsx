@@ -18,6 +18,7 @@ import {
   Camera,
   TextureLoader,
   Color,
+  Clock,
   // Ray,
   ClampToEdgeWrapping,
 } from 'three'
@@ -26,7 +27,6 @@ import glslify from 'glslify'
 import Movement from './movement'
 import Points from './particles/points'
 import Quad from './particles/quad'
-import Floor from './floor'
 import Effect from './postprocessing'
 
 import particlesVert from './../shader/particles.vert'
@@ -58,9 +58,11 @@ interface Props {
 const FakeBlobPage = ({ opts, width, height }: Props) => {
   const { gl, scene, camera, size }: any = useThree()
 
+  const clock = useMemo(() => new Clock(), [])
+
   // scene
-  const particlesScene = useMemo(() => new Scene(), [])
-  const particlesScene2 = useMemo(() => new Scene(), [])
+  const depthScene = useMemo(() => new Scene(), [])
+  const additiveScene = useMemo(() => new Scene(), [])
   const quadScene = useMemo(() => new Scene(), [])
   const movementScene = useMemo(() => new Scene(), [])
 
@@ -164,8 +166,8 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
   )
 
   // material
-  const particlesMaterial = useRef<THREE.ShaderMaterial>(null)
-  particlesMaterial.current = useMemo(
+  const quadMaterial = useRef<THREE.ShaderMaterial>(null)
+  quadMaterial.current = useMemo(
     () => new ShaderMaterial({
       uniforms: {
         uInset: new Uniform(0),
@@ -262,9 +264,6 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
   )
 
   const movementMaterial = useRef<THREE.ShaderMaterial>(null)
-  const quadMaterial = useRef<THREE.ShaderMaterial>(particlesMaterial.current)
-  const pointsMaterial = useRef<THREE.ShaderMaterial>(depthMaterial.current)
-  const pointsMaterial2 = useRef<THREE.ShaderMaterial>(additiveMaterial.current)
 
   // const ray = useMemo(() => new Ray(), [])
 
@@ -272,7 +271,9 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
   let insetExtra = 0
 
   const floorColor = new Color('#fff')
-  useFrame(({ clock }) => {
+  useFrame(() => {
+    const dt = clock.getDelta() * 1000
+
     const tmpColor = floorColor
     tmpColor.lerp(new Color(opts.bgColor), 0.05)
     if (quadMaterial.current) {
@@ -283,8 +284,6 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
 
     const clearColor = gl.getClearColor().getHex()
     const clearAlpha = gl.getClearAlpha()
-  
-    const dt = clock.getDelta() * 100000
 
     gl.autoClearColor = false
 
@@ -326,7 +325,7 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
     depthMaterial.current.uniforms.uCameraPosition.value = camera.position
     gl.setRenderTarget(depthRenderTarget.current)
     gl.clear()
-    gl.render(particlesScene, camera)
+    gl.render(depthScene, camera)
     gl.setRenderTarget(null)
 
     const skipMatrixUpdate = !(opts.dieSpeed || opts.speed) && opts.motionBlur
@@ -345,7 +344,7 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
     additiveMaterial.current.uniforms.uCameraPosition.value = camera.position
     gl.setRenderTarget(additiveRenderTarget.current)
     gl.clear()
-    gl.render(particlesScene2, camera)
+    gl.render(additiveScene, camera)
     gl.setRenderTarget(null)
 
     // const blurRadius = opts.blur
@@ -384,12 +383,12 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
     //   gl.setRenderTarget(null)
     // }
 
-    // particlesMaterial.current.uniforms.uSphereMap.value = tex
-    particlesMaterial.current.uniforms.uInset.value = additiveMaterial.current.uniforms.uInset.value
-    particlesMaterial.current.uniforms.uWashout.value +=
-    (opts.washout - particlesMaterial.current.uniforms.uWashout.value) * 0.05
-    particlesMaterial.current.uniforms.uDepth.value = depthRenderTarget.current.texture
-    particlesMaterial.current.uniforms.uAdditive.value = additiveRenderTarget.current.texture
+    // quadMaterial.current.uniforms.uSphereMap.value = tex
+    quadMaterial.current.uniforms.uInset.value = additiveMaterial.current.uniforms.uInset.value
+    quadMaterial.current.uniforms.uWashout.value +=
+    (opts.washout - quadMaterial.current.uniforms.uWashout.value) * 0.05
+    quadMaterial.current.uniforms.uDepth.value = depthRenderTarget.current.texture
+    quadMaterial.current.uniforms.uAdditive.value = additiveRenderTarget.current.texture
 
     gl.setClearColor(clearColor, clearAlpha)
     gl.autoClearColor = true
@@ -414,7 +413,7 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
     additiveRenderTarget.current.setSize(w, h)
     blurRenderTarget.current.setSize(w, h)
 
-    particlesMaterial.current.uniforms.uResolution.value.set(w, h)
+    quadMaterial.current.uniforms.uResolution.value.set(w, h)
     additiveMaterial.current.uniforms.uResolution.value.set(w, h)
     blurHMaterial.current.uniforms.uResolution.value.set(w, h)
     blurVMaterial.current.uniforms.uResolution.value.set(w, h)
@@ -430,13 +429,13 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
   const movementRef: any = {
     material: movementMaterial,
   }
-  const pointsRef: any = {
+  const depthRef: any = {
     points,
-    material: pointsMaterial,
+    material: depthMaterial,
   }
-  const pointsRef2: any = {
+  const additiveRef: any = {
     points,
-    material: pointsMaterial2,
+    material: additiveMaterial,
   }
   const quadRef: any = {
     material: quadMaterial,
@@ -448,7 +447,6 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
 
   return (
     <>
-      <Floor color={floorColor} />
       {createPortal(
         <Movement
           ref={movementRef}
@@ -460,19 +458,19 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
       )}
       {createPortal(
         <Points
-          ref={pointsRef}
+          ref={depthRef}
           width={width}
           height={height}
         />,
-        particlesScene,
+        depthScene,
       )}
       {createPortal(
         <Points
-          ref={pointsRef2}
+          ref={additiveRef}
           width={width}
           height={height}
         />,
-        particlesScene2,
+        additiveScene,
       )}
       {createPortal(
         <Quad
@@ -484,10 +482,6 @@ const FakeBlobPage = ({ opts, width, height }: Props) => {
         ref={effectRef}
         opts={opts}
       />
-      <group position-y={500}>
-        <ambientLight color="#333" />
-        <pointLight intensity={1} distance={800} color={opts.bgColor} />
-      </group>
     </>
   )
 }

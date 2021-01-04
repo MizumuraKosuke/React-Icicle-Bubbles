@@ -1,12 +1,16 @@
 import { useState } from 'react'
+import { Color } from 'three'
 import { Canvas } from 'react-three-fiber'
 import dynamic from 'next/dynamic'
 
 import FakeBlob from '../components/view'
+import Floor from '../components/floor'
 import GUI from '../components/gui'
 
 const Stats = dynamic(() => import('../components/stats'), { ssr: false })
 const OrbitControls = dynamic(() => import('../components/orditControls'), { ssr: false })
+
+const floorColor = new Color('#fff')
 
 const amountMap = {
   '4k' : [ 64, 64 ],
@@ -75,6 +79,11 @@ const Home = () => {
           width={amountInfo[0]}
           height={amountInfo[1]}
         />
+        <Floor color={floorColor} />
+        <group position-y={500}>
+          <ambientLight color="#333" />
+          <pointLight intensity={1} distance={800} color={opts.bgColor} />
+        </group>
         <OrbitControls />
       </Canvas>
       <Stats />
