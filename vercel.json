@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "alias": [],
+  "builds": [
+    { "src": "package.json", "use": "@vercel/next" }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/src/$1" }
+  ]
+}

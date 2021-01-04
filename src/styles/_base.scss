@@ -1,0 +1,18 @@
+html,
+body {
+  @apply bg-gray-50 dark:bg-gray-900 antialiased;
+  margin: 0;
+  letter-spacing: .05em;
+}
+
+p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.container {
+  @apply max-w-7xl mx-auto px-4;
+}
+.container-sm {
+  @apply max-w-6xl mx-auto px-4;
+}

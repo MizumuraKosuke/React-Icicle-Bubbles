@@ -1,0 +1,6 @@
+node_modules/
+**/*.js
+**/*.jsx
+**/*.ts
+**/*.tsx
+**/*.svg
