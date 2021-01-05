@@ -11,6 +11,7 @@ import {
   DataTexture,
   NoBlending,
   Ray,
+  Clock,
 } from 'three'
 import glslify from 'glslify'
 import { useMove, useDrag } from 'react-use-gesture'
@@ -26,7 +27,6 @@ const Move = (_props, ref) => {
   const {
     movementPrevRenderTarget,
     movementRenderTarget,
-    dt,
     opts,
   } = ref
   const material = useRef<THREE.ShaderMaterial>(null)
@@ -36,6 +36,7 @@ const Move = (_props, ref) => {
   const rawShaderPrefix = 'precision ' + gl.capabilities.precision + ' float;\n'
 
   const ray = useMemo(() => new Ray(), [])
+  const clock = useMemo(() => new Clock(), [])
 
   const [
     {
@@ -115,7 +116,8 @@ const Move = (_props, ref) => {
       return
     }
 
-    const deltaRatio = dt.current / 16.6667
+    const dt = clock.getDelta() * 1000
+    const deltaRatio = dt / 16.6667
 
     const tmp = movementPrevRenderTarget.current.clone()
     movementPrevRenderTarget.current = movementRenderTarget.current
@@ -123,20 +125,19 @@ const Move = (_props, ref) => {
   
     material.current.uniforms.texturePosition.value =
     movementPrevRenderTarget.current.texture
-    material.current.uniforms.time.value += dt.current * opts.current.speed * 0.001
+    material.current.uniforms.time.value += dt * opts.current.speed * 0.001
     material.current.uniforms.dieSpeed.value = opts.current.dieSpeed * deltaRatio
     material.current.uniforms.attraction.value = opts.current.attraction * opts.current.speed * deltaRatio
     material.current.uniforms.speed.value = opts.current.speed * deltaRatio
     material.current.uniforms.initAnimation.value = Math.min(
-      material.current.uniforms.initAnimation.value + dt.current * 0.00025, 1,
+      material.current.uniforms.initAnimation.value + dt * 0.00025, 1,
     )
 
-    camera.updateMatrixWorld()
     ray.origin.setFromMatrixPosition(camera.matrixWorld)
     ray.direction.set(
       mouseX.value, mouseY.value, 0.5 ).unproject(camera).sub(ray.origin).normalize()
     const distance = ray.origin.length() / Math.cos(Math.PI - ray.direction.angleTo(ray.origin))
-    ray.origin.add( ray.direction.multiplyScalar(distance * 1.0))
+    ray.origin.add(ray.direction.multiplyScalar(distance * 1.0))
     material.current.uniforms.mouse3d.value.copy(ray.origin)
   })
 

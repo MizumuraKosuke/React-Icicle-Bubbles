@@ -8,7 +8,6 @@ import {
   WebGLRenderTarget,
   Scene,
   Color,
-  Clock,
   ClampToEdgeWrapping,
 } from 'three'
 
@@ -23,8 +22,6 @@ import Effect from './postprocessing'
 const FakeBlobPage = (_props, ref) => {
   const { opts } = ref
   const { gl, scene, camera, size }: any = useThree()
-  const clock = useMemo(() => new Clock(), [])
-  const dt = useRef(0)
 
   // scene
   const depthScene = useMemo(() => new Scene(), [])
@@ -106,11 +103,8 @@ const FakeBlobPage = (_props, ref) => {
   const composer = useRef<any>()
   const vignette = useRef<any>()
 
-  const floorColor = new Color('#fff')
   useFrame(() => {
-    dt.current = clock.getDelta() * 1000
-
-    const tmpColor = floorColor
+    const tmpColor = opts.current.floorColor
     tmpColor.lerp(new Color(opts.current.bgColor), 0.05)
     scene.fog.color.copy(tmpColor)
     gl.setClearColor(tmpColor.getHex())
@@ -172,7 +166,7 @@ const FakeBlobPage = (_props, ref) => {
   }, [ size ])
 
   useEffect(() => {
-    gl.setClearColor(opts.current.bgColor)
+    // gl.setClearColor(opts.current.bgColor)
     scene.fog = new FogExp2(opts.current.bgColor, 0.001)
     camera.position.set(300, 60, 300).normalize().multiplyScalar(500)
   }, [])
@@ -180,7 +174,6 @@ const FakeBlobPage = (_props, ref) => {
   const movementRef: any = {
     movementPrevRenderTarget,
     movementRenderTarget,
-    dt,
     opts,
   }
   const depthRef: any = {

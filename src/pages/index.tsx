@@ -10,8 +10,6 @@ import GUI from '../components/gui'
 const Stats = dynamic(() => import('../components/stats'), { ssr: false })
 const OrbitControls = dynamic(() => import('../components/orditControls'), { ssr: false })
 
-const floorColor = new Color('#fff')
-
 const amountMap = {
   '4k' : [ 64, 64 ],
   '8k' : [ 128, 64 ],
@@ -62,6 +60,7 @@ const Home = () => {
   initialOpts.width = amount[0]
   initialOpts.height = amount[1]
   initialOpts.amount = initialOpts.width * initialOpts.height
+  initialOpts.floorColor = new Color('#fff')
   const optsRef = useRef(initialOpts)
 
   const onChange = (data: any) => {
@@ -70,6 +69,7 @@ const Home = () => {
     data.width = amount[0]
     data.height = amount[1]
     data.amount = data.width * data.height
+    data.floorColor = new Color('#fff')
     optsRef.current = data
   }
 
@@ -92,7 +92,7 @@ const Home = () => {
         <FakeBlob
           ref={fakeblobRef}
         />
-        <Floor color={floorColor} />
+        <Floor color={optsRef.current.floorColor} />
         <group position-y={500}>
           <ambientLight color="#333" />
           <pointLight intensity={1} distance={800} color={optsRef.current.bgColor} />
