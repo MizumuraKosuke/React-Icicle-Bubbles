@@ -11,7 +11,6 @@ interface Props {
 
 const GUI = ({ opts, setOpts }: Props) => (
   <DatGui
-    className="overflow-scroll h-full text-black"
     style={{
       fontSize: '11px',
       width: '17rem',

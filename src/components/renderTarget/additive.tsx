@@ -14,17 +14,15 @@ import { useFrame, useThree } from 'react-three-fiber'
 import glslify from 'glslify'
 
 
-import additiveVert from '../../shader/additive.vert'
-import additiveFrag from '../../shader/additive.frag'
-const additiveVertexShader = glslify(additiveVert)
-const additiveFragmentShader = glslify(additiveFrag)
+import vert from '../../shader/additive.vert'
+import frag from '../../shader/additive.frag'
+const vertexShader = glslify(vert)
+const fragmentShader = glslify(frag)
 
 const Additive = (_props, ref) => {
   const {
     movementRenderTarget,
     depthRenderTarget,
-    baseInset,
-    insetExtra,
     opts,
   } = ref
 
@@ -37,7 +35,7 @@ const Additive = (_props, ref) => {
       uParticleSize : new Uniform(opts.current.particleSize),
       uTexturePosition: new Uniform(movementRenderTarget.current.texture),
       uDepth: new Uniform(depthRenderTarget.current.texture),
-      uInset: new Uniform(0),
+      uInset: new Uniform(opts.current.inset),
       uResolution: new Uniform(new Vector2()),
     }),
     [],
@@ -55,8 +53,6 @@ const Additive = (_props, ref) => {
   }, [])
 
   useFrame(() => {
-    material.current.uniforms.uInset.value = baseInset.current + insetExtra.current
-
     material.current.uniforms.uTexturePosition.value = movementRenderTarget.current.texture
     material.current.uniforms.uDepth.value = depthRenderTarget.current.texture
   })
@@ -82,10 +78,11 @@ const Additive = (_props, ref) => {
       </bufferGeometry>
       <shaderMaterial
         ref={material}
-        vertexShader={additiveVertexShader}
-        fragmentShader={additiveFragmentShader}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
         uniforms={uniforms}
         uniforms-uParticleSize-value={opts.current.particleSize}
+        uniforms-uInset-value={opts.current.inset}
         blending={CustomBlending}
         blendEquation={AddEquation}
         blendSrc={OneFactor}

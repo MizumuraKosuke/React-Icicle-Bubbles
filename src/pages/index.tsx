@@ -39,7 +39,7 @@ const initialOpts: any = {
   inset: 0.5,
   washout: 0.7,
   brightness: 0.3,
-  blur: 1,
+  blur: 0,
   blurZ: 0.8,
   bgColor: '#3c4a4a',
   // Post-Processing
@@ -84,7 +84,6 @@ const Home = () => {
         }}
         pixelRatio={typeof window !== 'undefined' ? window.devicePixelRatio : 1}
         camera={{
-          aspect: 1,
           near: 10,
           far: 5000,
           fov: 45,
@@ -96,7 +95,7 @@ const Home = () => {
         <Floor color={floorColor} />
         <group position-y={500}>
           <ambientLight color="#333" />
-          <pointLight intensity={1} distance={800} color={opts.bgColor} />
+          <pointLight intensity={1} distance={800} color={optsRef.current.bgColor} />
         </group>
         <OrbitControls />
       </Canvas>

@@ -1,5 +1,6 @@
-import { useRef, useMemo, useEffect, forwardRef } from 'react'
+import { useRef, useMemo, forwardRef } from 'react'
 import { useThree, useFrame } from 'react-three-fiber'
+import { isMobile } from 'react-device-detect'
 import {
   Uniform,
   Vector2,
@@ -12,7 +13,7 @@ import {
   Ray,
 } from 'three'
 import glslify from 'glslify'
-import { useMove } from 'react-use-gesture'
+import { useMove, useDrag } from 'react-use-gesture'
 import { useSpring, animated } from '../../../node_modules/react-spring/three'
 
 import vert from '../../shader/default.vert'
@@ -46,17 +47,30 @@ const Move = (_props, ref) => {
     mouseX: 0,
     mouseY: 0,
     deltaDistance: 1,
-    config: { mass: 10, tension: 400, friction: 50 },
+    // config: { mass: 10, tension: 400, friction: 50 },
   }))
-  const bind: any = useMove(
-    ({ xy: [ x, y ], distance }) => setMouse({
-      mouseX: x / opts.current.width * 2 - 1,
-      mouseY: y / opts.current.height * 2 + 1,
-      deltaDistance: distance / 10,
-    }),
-    { domTarget: typeof window !== 'undefined' ? window : null },
-  )
-  useEffect(bind, [ bind ])
+
+  if (isMobile) {
+    useDrag(
+      ({ xy: [ x, y ], delta: [ dx, dy ] }) => {
+        setMouse({
+        mouseX: (2 * x - window.innerWidth) / window.innerWidth,
+        mouseY: -(2 * y - window.innerHeight) / window.innerHeight,
+        deltaDistance: Math.sqrt(dx * dx + dy * dy) / 10,
+      })},
+      { domTarget: typeof window !== 'undefined' ? window : null },
+    )
+  } else {
+    useMove(
+      ({ xy: [ x, y ], delta: [ dx, dy ] }) => {
+        setMouse({
+        mouseX: (2 * x - window.innerWidth) / window.innerWidth,
+        mouseY: -(2 * y - window.innerHeight) / window.innerHeight,
+        deltaDistance: Math.sqrt(dx * dx + dy * dy) / 10,
+      })},
+      { domTarget: typeof window !== 'undefined' ? window : null },
+    )
+  }
 
   const uniforms = useMemo(() => {
     const positions = new Float32Array(opts.current.amount * 4)
@@ -123,7 +137,7 @@ const Move = (_props, ref) => {
       mouseX.value, mouseY.value, 0.5 ).unproject(camera).sub(ray.origin).normalize()
     const distance = ray.origin.length() / Math.cos(Math.PI - ray.direction.angleTo(ray.origin))
     ray.origin.add( ray.direction.multiplyScalar(distance * 1.0))
-    // material.current.uniforms.mouse3d.value.copy(ray.origin)
+    material.current.uniforms.mouse3d.value.copy(ray.origin)
   })
 
   return (

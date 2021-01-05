@@ -12,10 +12,10 @@ import { useFrame } from 'react-three-fiber'
 import glslify from 'glslify'
 
 
-import depthVert from '../../shader/depth.vert'
-import depthFrag from '../../shader/depth.frag'
-const depthVertexShader = glslify(depthVert)
-const depthFragmentShader = glslify(depthFrag)
+import vert from '../../shader/depth.vert'
+import frag from '../../shader/depth.frag'
+const vertexShader = glslify(vert)
+const fragmentShader = glslify(frag)
 
 const Depth = (_props, ref) => {
   const {
@@ -33,7 +33,6 @@ const Depth = (_props, ref) => {
       uTexturePosition: new Uniform(movementRenderTarget.current.texture),
       uTexturePrevPosition: new Uniform(null),
       uPrevModelViewMatrix: new Uniform(new Matrix4()),
-      uMotionMultiplier: new Uniform(1),
     }),
     [],
   )
@@ -75,11 +74,12 @@ const Depth = (_props, ref) => {
       </bufferGeometry>
       <shaderMaterial
         ref={material}
-        vertexShader={depthVertexShader}
-        fragmentShader={depthFragmentShader}
+        vertexShader={vertexShader}
+        fragmentShader={fragmentShader}
         uniforms={uniforms}
         uniforms-uParticleSize-value={opts.current.particleSize}
         blending={NoBlending}
+        transparent
       />
     </points>
   )

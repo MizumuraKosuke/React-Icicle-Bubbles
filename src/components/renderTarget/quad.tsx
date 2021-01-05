@@ -3,6 +3,7 @@ import {
   Uniform,
   Vector2,
   TextureLoader,
+  LinearFilter,
   // WebGLRenderTarget,
   // NearestFilter,
   // RGBAFormat,
@@ -20,8 +21,6 @@ const Quad = (_props, ref) => {
   const {
     depthRenderTarget,
     additiveRenderTarget,
-    baseInset,
-    insetExtra,
     opts,
   } = ref
   const material = useRef<THREE.ShaderMaterial>(null)
@@ -38,18 +37,20 @@ const Quad = (_props, ref) => {
         src = '/images/matcap_plastic.jpg'
       }
       const sphereTexture = new TextureLoader().load(src, (texture) => {
+        texture.minFilter = LinearFilter
+        texture.magFilter = LinearFilter
         texture.anisotropy = gl.capabilities.getMaxAnisotropy()
         texture.flipY = false
         texture.needsUpdate = true
       })
       return sphereTexture
     },
-    [],
+    [ opts.current.matcap ],
   )
 
   const uniforms = useMemo(
     () => ({
-      uInset: new Uniform(0),
+      uInset: new Uniform(opts.current.inset),
       uWashout: new Uniform(0),
       uDepth : new Uniform(depthRenderTarget.current.texture),
       uAdditive : new Uniform(additiveRenderTarget.current.texture),
@@ -60,7 +61,6 @@ const Quad = (_props, ref) => {
   )
 
   useFrame(() => {
-    material.current.uniforms.uInset.value = baseInset.current + insetExtra.current
     material.current.uniforms.uWashout.value +=
     (opts.current.washout - material.current.uniforms.uWashout.value) * 0.05
     material.current.uniforms.uDepth.value = depthRenderTarget.current.texture
@@ -82,6 +82,7 @@ const Quad = (_props, ref) => {
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
+        uniforms-uInset-value={opts.current.inset}
         transparent
         depthWrite={false}
       />
