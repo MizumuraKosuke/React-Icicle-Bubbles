@@ -11,17 +11,18 @@ interface Props {
 
 const GUI = ({ opts, setOpts }: Props) => (
   <DatGui
-    className="overflow-scroll h-full"
+    className="overflow-scroll h-full text-black"
     style={{
       fontSize: '11px',
-      width: '17%',
+      width: '17rem',
     }}
     data={opts}
     onUpdate={setOpts}
   >
-    <DatFolder title="Simulator" closed={false}>
+    <DatFolder title="Simulator" closed>
       <DatSelect
-        path="amount"
+        path="amountMap"
+        label="amount"
         options={[
           '4k',
           '8k',
@@ -41,7 +42,7 @@ const GUI = ({ opts, setOpts }: Props) => (
       <DatNumber path="attraction" min={-2} max={2} step={0.1} />
       <DatBoolean path="toggleMovement" />
     </DatFolder>
-    <DatFolder title="Rendering" closed={false}>
+    <DatFolder title="Rendering" closed>
       <DatSelect
         path="matcap"
         options={[ 'default', 'plastic', 'metal' ]}
@@ -54,7 +55,7 @@ const GUI = ({ opts, setOpts }: Props) => (
       <DatNumber path="blurZ" min={0} max={1} step={0.001} />
       <DatColor path="bgColor"/>
     </DatFolder>
-    <DatFolder title="Post-Processing" closed={false}>
+    <DatFolder title="Post-Processing" closed>
       <DatNumber path="dof" min={0} max={3} step={0.001} />
       <DatBoolean path="dofMouse" label="dof on mouse" />
       <DatBoolean path="fxaa" />

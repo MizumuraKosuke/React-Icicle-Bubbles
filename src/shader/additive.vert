@@ -1,5 +1,4 @@
 uniform sampler2D uTexturePosition;
-uniform vec3 uCameraPosition;
 uniform float uParticleSize;
 
 varying float vHalfSize;

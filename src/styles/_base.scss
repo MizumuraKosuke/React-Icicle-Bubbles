@@ -9,6 +9,9 @@ p {
   margin: 0;
   line-height: 1.6;
 }
+select {
+  color: #000;
+}
 
 .container {
   @apply max-w-7xl mx-auto px-4;

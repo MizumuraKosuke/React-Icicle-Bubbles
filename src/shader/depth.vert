@@ -1,6 +1,5 @@
 uniform sampler2D uTexturePosition;
 uniform sampler2D uTexturePrevPosition;
-uniform vec3 uCameraPosition;
 uniform float uParticleSize;
 
 uniform mat4 uPrevModelViewMatrix;

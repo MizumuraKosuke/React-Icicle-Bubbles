@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Color } from 'three'
 import { Canvas } from 'react-three-fiber'
 import dynamic from 'next/dynamic'
 
-import FakeBlob from '../components/view'
+import FakeBlob from '../components/fakeblob'
 import Floor from '../components/floor'
 import GUI from '../components/gui'
 
@@ -24,40 +24,56 @@ const amountMap = {
   '1m' : [ 1024, 1024 ],
 }
 
-const Home = () => {
-  const [ opts, setOpts ] = useState({
-    // Simulator
-    amount: '16k',
-    speed: 1,
-    dieSpeed: 0.015,
-    radius: 0.5,
-    curlSize: 0.02,
-    attraction: -0.5,
-    toggleMovement: true,
-    // Rendering
-    matcap: 'metal',
-    particleSize: 21,
-    inset: 0.5,
-    washout: 0.7,
-    brightness: 0.3,
-    blur: 1,
-    blurZ: 0.8,
-    bgColor: '#3c4a4a',
-    // Post-Processing
-    dof: 1,
-    dofMouse: true,
-    fxaa: true,
-    motionBlur: true,
-    maxDistance: 120,
-    motionMultiplier: 2,
-    motionQuality: 'medium',
-    bloom: false,
-    bloomRadius: 1,
-    bloomAmount: 0.3,
-    vignette: true,
-  })
+const initialOpts: any = {
+  // Simulator
+  amountMap: '16k',
+  speed: 1,
+  dieSpeed: 0.015,
+  radius: 0.5,
+  curlSize: 0.02,
+  attraction: -0.5,
+  toggleMovement: true,
+  // Rendering
+  matcap: 'metal',
+  particleSize: 21,
+  inset: 0.5,
+  washout: 0.7,
+  brightness: 0.3,
+  blur: 1,
+  blurZ: 0.8,
+  bgColor: '#3c4a4a',
+  // Post-Processing
+  dof: 1,
+  dofMouse: true,
+  fxaa: true,
+  motionBlur: true,
+  maxDistance: 120,
+  motionMultiplier: 2,
+  motionQuality: 'medium',
+  bloom: false,
+  bloomRadius: 1,
+  bloomAmount: 0.3,
+  vignette: true,
+}
 
-  const amountInfo = amountMap[opts.amount]
+const Home = () => {
+  const [ opts, setOpts ] = useState(initialOpts)
+  let amount = amountMap[initialOpts.amountMap]
+  initialOpts.width = amount[0]
+  initialOpts.height = amount[1]
+  initialOpts.amount = initialOpts.width * initialOpts.height
+  const optsRef = useRef(initialOpts)
+
+  const onChange = (data: any) => {
+    setOpts(data)
+    amount = amountMap[data.amountMap]
+    data.width = amount[0]
+    data.height = amount[1]
+    data.amount = data.width * data.height
+    optsRef.current = data
+  }
+
+  const fakeblobRef: any = { opts: optsRef }
 
   return (
     <div className="fixed inset-0">
@@ -75,9 +91,7 @@ const Home = () => {
         }}
       >
         <FakeBlob
-          opts={opts}
-          width={amountInfo[0]}
-          height={amountInfo[1]}
+          ref={fakeblobRef}
         />
         <Floor color={floorColor} />
         <group position-y={500}>
@@ -87,7 +101,7 @@ const Home = () => {
         <OrbitControls />
       </Canvas>
       <Stats />
-      <GUI opts={opts} setOpts={setOpts} />
+      <GUI opts={opts} setOpts={onChange} />
     </div>
   )
 }

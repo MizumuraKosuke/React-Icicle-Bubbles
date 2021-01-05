@@ -1,5 +1,4 @@
 uniform vec2 uResolution;
-uniform vec3 uFogColor;
 uniform float uInset;
 uniform float uWashout;
 
@@ -37,8 +36,6 @@ void main() {
 
     float centerZ = texture2D( uDepth, gl_FragCoord.xy  / uResolution ).a;
     centerZ = max(0.0, centerZ - 120.0);
-
-    // float fogFactor = whiteCompliment( exp2( - 0.0015  * 0.0015     * centerZ *centerZ * LOG2 ) );
 
     color.xyz = min(vec3(1.0), mix(blendOverlay(color.xyz,  blend.xyz), max(color.xyz,  blend.xyz), uWashout));
 
