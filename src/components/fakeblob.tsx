@@ -17,7 +17,6 @@ import Additive from './renderTarget/additive'
 import BlurH from './renderTarget/blurH'
 import BlurV from './renderTarget/blurV'
 import Quad from './renderTarget/quad'
-import Effect from './postprocessing'
 
 const FakeBlobPage = (_props, ref) => {
   const { opts } = ref
@@ -99,9 +98,6 @@ const FakeBlobPage = (_props, ref) => {
     },
     [],
   )
-
-  const composer = useRef<any>()
-  const vignette = useRef<any>()
 
   useFrame(() => {
     const tmpColor = opts.current.floorColor
@@ -199,11 +195,6 @@ const FakeBlobPage = (_props, ref) => {
     additiveRenderTarget,
     opts,
   }
-  const effectRef: any = {
-    composer,
-    vignette,
-    opts,
-  }
 
   return (
     <>
@@ -232,9 +223,6 @@ const FakeBlobPage = (_props, ref) => {
         <Quad ref={quadRef} />,
         quadScene,
       )}
-      <Effect
-        ref={effectRef}
-      />
     </>
   )
 }

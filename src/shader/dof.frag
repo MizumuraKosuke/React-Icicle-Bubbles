@@ -1,5 +1,5 @@
 uniform vec2 u_resolution;
-uniform sampler2D u_texture;
+uniform sampler2D tDiffuse;
 uniform sampler2D u_distance;
 uniform vec2 u_mouse;
 uniform float u_dofDistance;
@@ -21,17 +21,17 @@ void main() {
     vec2 d = u_delta * resolutionInverted * bias * u_amount;
 
     vec4 sum = vec4(0.0);
-    vec4 center = texture2D( u_texture, uv );
+    vec4 center = texture2D( tDiffuse, uv );
     d *= length(center.xyz);
-    sum += texture2D( u_texture, ( uv - d * 4. ) ) * 0.051;
-    sum += texture2D( u_texture, ( uv - d * 3. ) ) * 0.0918;
-    sum += texture2D( u_texture, ( uv - d * 2. ) ) * 0.12245;
-    sum += texture2D( u_texture, ( uv - d * 1. ) ) * 0.1531;
+    sum += texture2D( tDiffuse, ( uv - d * 4. ) ) * 0.051;
+    sum += texture2D( tDiffuse, ( uv - d * 3. ) ) * 0.0918;
+    sum += texture2D( tDiffuse, ( uv - d * 2. ) ) * 0.12245;
+    sum += texture2D( tDiffuse, ( uv - d * 1. ) ) * 0.1531;
     sum += center * 0.1633;
-    sum += texture2D( u_texture, ( uv + d * 1. ) ) * 0.1531;
-    sum += texture2D( u_texture, ( uv + d * 2. ) ) * 0.12245;
-    sum += texture2D( u_texture, ( uv + d * 3. ) ) * 0.0918;
-    sum += texture2D( u_texture, ( uv + d * 4. ) ) * 0.051;
+    sum += texture2D( tDiffuse, ( uv + d * 1. ) ) * 0.1531;
+    sum += texture2D( tDiffuse, ( uv + d * 2. ) ) * 0.12245;
+    sum += texture2D( tDiffuse, ( uv + d * 3. ) ) * 0.0918;
+    sum += texture2D( tDiffuse, ( uv + d * 4. ) ) * 0.051;
 
     gl_FragColor = sum;
 }

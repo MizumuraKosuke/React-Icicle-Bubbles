@@ -1,6 +1,5 @@
-uniform sampler2D u_texture;
+uniform sampler2D tDiffuse;
 uniform vec2 u_resolution;
-uniform float u_aspect;
 
 uniform float u_reduction;
 uniform float u_boost;
@@ -13,7 +12,7 @@ float range(float vmin, float vmax, float value) {
 
 void main() {
 
-  vec4 color = texture2D( u_texture, v_uv );
+  vec4 color = texture2D( tDiffuse, v_uv );
 
   vec2 center = u_resolution * 0.5;
   float vignette = range(0.25, 1.0, length( v_uv - vec2(0.5) ));

@@ -4,6 +4,7 @@ import { Canvas } from 'react-three-fiber'
 import dynamic from 'next/dynamic'
 
 import FakeBlob from '../components/fakeblob'
+import Effect from '../components/postprocessing'
 import Floor from '../components/floor'
 import GUI from '../components/gui'
 
@@ -93,6 +94,7 @@ const Home = () => {
           ref={fakeblobRef}
         />
         <Floor color={optsRef.current.floorColor} />
+        {/* <Effect opts={opts} /> */}
         <group position-y={500}>
           <ambientLight color="#333" />
           <pointLight intensity={1} distance={800} color={optsRef.current.bgColor} />
