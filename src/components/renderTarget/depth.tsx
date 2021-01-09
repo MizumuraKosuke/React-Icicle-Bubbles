@@ -3,10 +3,6 @@ import {
   Uniform,
   Matrix4,
   NoBlending,
-  // WebGLRenderTarget,
-  // NearestFilter,
-  // RGBAFormat,
-  // FloatType,
 } from 'three'
 import { useFrame } from 'react-three-fiber'
 import glslify from 'glslify'

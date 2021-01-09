@@ -3,10 +3,10 @@ import { Color } from 'three'
 import { Canvas } from 'react-three-fiber'
 import dynamic from 'next/dynamic'
 
-import FakeBlob from '../components/fakeblob'
-import Effect from '../components/postprocessing'
+// import Effect from '../components/postprocessing'
 import Floor from '../components/floor'
 import GUI from '../components/gui'
+import Fakeblob from '../components/fakeblob'
 
 const Stats = dynamic(() => import('../components/stats'), { ssr: false })
 const OrbitControls = dynamic(() => import('../components/orditControls'), { ssr: false })
@@ -75,6 +75,7 @@ const Home = () => {
   }
 
   const fakeblobRef: any = { opts: optsRef }
+  // const effectRef: any = { opts:  optsRef }
 
   return (
     <div className="fixed inset-0">
@@ -90,15 +91,13 @@ const Home = () => {
           fov: 45,
         }}
       >
-        <FakeBlob
-          ref={fakeblobRef}
-        />
+        <Fakeblob ref={fakeblobRef} />
         <Floor color={optsRef.current.floorColor} />
-        {/* <Effect opts={opts} /> */}
         <group position-y={500}>
           <ambientLight color="#333" />
           <pointLight intensity={1} distance={800} color={optsRef.current.bgColor} />
         </group>
+        {/* <Effect ref={effectRef} /> */}
         <OrbitControls />
       </Canvas>
       <Stats />

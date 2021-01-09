@@ -1,12 +1,12 @@
 import { forwardRef } from 'react'
 import { EffectComposer, Bloom, Vignette } from 'react-postprocessing'
 
-const Effect = ({ opts }) => {
-  console.log(opts.vignette)
+const Effect = (_props, ref) => {
+  const { opts } = ref
   return (
     <EffectComposer>
       {
-        opts.bloom && (
+        opts.current.bloom && (
           <Bloom
             luminanceThreshold={0}
             luminanceSmoothing={0.9}
@@ -15,7 +15,7 @@ const Effect = ({ opts }) => {
         )
       }
       {
-        opts.vignette && (
+        opts.current.vignette && (
           <Vignette
             eskil={false}
             offset={0.1}

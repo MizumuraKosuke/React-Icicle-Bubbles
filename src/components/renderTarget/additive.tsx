@@ -5,10 +5,6 @@ import {
   CustomBlending,
   AddEquation,
   OneFactor,
-  // WebGLRenderTarget,
-  // NearestFilter,
-  // RGBAFormat,
-  // FloatType,
 } from 'three'
 import { useFrame, useThree } from 'react-three-fiber'
 import glslify from 'glslify'
