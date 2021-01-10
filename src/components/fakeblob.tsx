@@ -10,7 +10,7 @@ import {
   Color,
   ClampToEdgeWrapping,
 } from 'three'
-import FBOHelper from '../utils/FBOHelper'
+import FBOHelper from 'three.fbo-helper'
 
 import Movement from './renderTarget/movement'
 import Depth from './renderTarget/depth'

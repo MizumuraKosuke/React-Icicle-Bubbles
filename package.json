@@ -23,8 +23,7 @@
     "react-three-fiber": "^5.3.7",
     "react-use-gesture": "^8.0.1",
     "sass": "^1.30.0",
-    "three": "^0.123.0",
-    "three.fbo-helper": "^1.1.1"
+    "three": "^0.123.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",
@@ -47,6 +46,7 @@
     "stylelint-order": "^4.1.0",
     "stylelint-scss": "^3.18.0",
     "tailwindcss": "^2.0.1",
+    "three.fbo-helper": "git+https://github.com/MizumuraKosuke/THREE.FBOHelper.git",
     "typescript": "^4.1.2"
   }
 }
