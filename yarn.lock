@@ -6297,6 +6297,11 @@ text-table@^0.2.0:
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
 
+three.fbo-helper@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/three.fbo-helper/-/three.fbo-helper-1.1.1.tgz#53bdf7e0b942bdd0a5f04d52586a58bbe930b4cb"
+  integrity sha512-PzeKhZIZYbmCU/p/w4gbGvs85GWE1LCdB7zEA9jhcldd2vkrE/fCO/Q+d2/i8iQiMy1+Exj2mzgJGpiAITEZ7A==
+
 three@^0.123.0:
   version "0.123.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.123.0.tgz#3bb6d8f908a432eb7cd450f7eab6dd40fde53085"

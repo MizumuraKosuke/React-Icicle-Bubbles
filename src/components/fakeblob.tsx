@@ -10,6 +10,7 @@ import {
   Color,
   ClampToEdgeWrapping,
 } from 'three'
+import FBOHelper from '../utils/FBOHelper'
 
 import Movement from './renderTarget/movement'
 import Depth from './renderTarget/depth'
@@ -33,6 +34,8 @@ const FakeBlobPage = (_props, ref) => {
   const quadCamera = useRef<THREE.OrthographicCamera>()
   const movementCamera = useRef<THREE.OrthographicCamera>()
 
+  const fbohelper = useMemo(() => new FBOHelper(gl), [])
+
   // render target
   const movementRenderTarget = useRef<THREE.WebGLRenderTarget>(null)
   const movementPrevRenderTarget = useRef<THREE.WebGLRenderTarget>(null)
@@ -50,6 +53,7 @@ const FakeBlobPage = (_props, ref) => {
         depthBuffer: false,
         stencilBuffer: false,
       })
+      fbohelper.attach(renderTarget, 'movement')
       movementPrevRenderTarget.current = renderTarget.clone()
       return renderTarget
     },
@@ -65,6 +69,7 @@ const FakeBlobPage = (_props, ref) => {
         type: HalfFloatType,
         stencilBuffer: false,
       })
+      fbohelper.attach(renderTarget, 'depth')
       return renderTarget
     },
     [],
@@ -80,6 +85,7 @@ const FakeBlobPage = (_props, ref) => {
         depthBuffer: false,
         stencilBuffer: false,
       })
+      fbohelper.attach(renderTarget, 'additive')
       return renderTarget
     },
     [],
@@ -94,6 +100,7 @@ const FakeBlobPage = (_props, ref) => {
         type: HalfFloatType,
         stencilBuffer: false,
       })
+      fbohelper.attach(renderTarget, 'blur')
       return renderTarget
     },
     [],
@@ -150,6 +157,7 @@ const FakeBlobPage = (_props, ref) => {
     gl.render(quadScene, quadCamera.current)
 
     gl.autoClearColor = true
+    fbohelper.update()
   }, 1)
 
   useEffect(() => {
@@ -159,6 +167,7 @@ const FakeBlobPage = (_props, ref) => {
     depthRenderTarget.current.setSize(w, h)
     additiveRenderTarget.current.setSize(w, h)
     blurRenderTarget.current.setSize(w, h)
+    fbohelper.setSize(w, h)
   }, [ size ])
 
   useEffect(() => {
