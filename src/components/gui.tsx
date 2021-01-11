@@ -61,10 +61,10 @@ const GUI = ({ opts, setOpts }: Props) => (
       <DatBoolean path="mothinBlur" />
       <DatNumber path="maxDistance" label="motion distance" min={1} max={300} step={1} />
       <DatNumber path="motionMultiplier" label="motion multiplier" min={0.1} max={15} step={0.1} /> */}
-      <DatSelect
+      {/* <DatSelect
         path="motionQuality"
         options={[ 'best', 'high', 'medium', 'row' ]}
-      />
+      /> */}
       <DatBoolean path="bloom" />
       {/* <DatNumber path="bloomRadius" label="bloom radius" min={0} max={3} step={0.1} /> */}
       <DatNumber path="bloomIntensity" label="bloom amount" min={0} max={3} step={0.1} />
