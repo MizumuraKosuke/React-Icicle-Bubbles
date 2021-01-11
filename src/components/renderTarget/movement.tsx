@@ -23,12 +23,11 @@ import frag from '../../shader/position.frag'
 const vertexShader = glslify(vert)
 const fragmentShader = glslify(frag)
 
-const Move = (_props, ref) => {
-  const {
-    movementPrevRenderTarget,
-    movementRenderTarget,
-    opts,
-  } = ref
+interface Props {
+  opts: any
+}
+
+const Move = ({ opts }: Props, { movementPrevRenderTarget, movementRenderTarget }: any) => {
   const material = useRef<THREE.ShaderMaterial>(null)
 
   const { gl, camera } = useThree()
@@ -74,9 +73,9 @@ const Move = (_props, ref) => {
   }
 
   const uniforms = useMemo(() => {
-    const positions = new Float32Array(opts.current.amount * 4)
+    const positions = new Float32Array(opts.amount * 4)
 
-    for(let i = 0; i < opts.current.amount; i++) {
+    for(let i = 0; i < opts.amount; i++) {
       const i4 = i * 4
       const r = (0.5 + Math.random() * 0.5) * 75
       const phi = (Math.random() - 0.5) * Math.PI
@@ -87,7 +86,7 @@ const Move = (_props, ref) => {
       positions[i4 + 3] = Math.random()
     }
     const texture = new DataTexture(
-      positions, opts.current.width, opts.current.height, RGBAFormat, FloatType,
+      positions, opts.width, opts.height, RGBAFormat, FloatType,
     )
     texture.minFilter = NearestFilter
     texture.magFilter = NearestFilter
@@ -96,23 +95,23 @@ const Move = (_props, ref) => {
     texture.flipY = false
   
     return {
-      resolution: new Uniform(new Vector2(opts.current.width, opts.current.height)),
+      resolution: new Uniform(new Vector2(opts.width, opts.height)),
       texturePosition: new Uniform(texture),
       textureDefaultPosition: new Uniform(texture),
       mouse3d: new Uniform(new Vector3()),
       speed: new Uniform(0),
       dieSpeed: new Uniform(0),
       deltaDistance: new Uniform(1),
-      radius: new Uniform(opts.current.radius),
+      radius: new Uniform(opts.radius),
       attraction: new Uniform(0),
       time: new Uniform(0),
       initAnimation: new Uniform(0),
-      curlSize: new Uniform(opts.current.curlSize),
+      curlSize: new Uniform(opts.curlSize),
     }
   }, [])
 
   useFrame(() => {
-    if (!opts.current.speed && !opts.current.dieSpeed || !opts.current.toggleMovement) {
+    if (!opts.speed && !opts.dieSpeed || !opts.toggleMovement) {
       return
     }
 
@@ -125,10 +124,10 @@ const Move = (_props, ref) => {
   
     material.current.uniforms.texturePosition.value =
     movementPrevRenderTarget.current.texture
-    material.current.uniforms.time.value += dt * opts.current.speed * 0.001
-    material.current.uniforms.dieSpeed.value = opts.current.dieSpeed * deltaRatio
-    material.current.uniforms.attraction.value = opts.current.attraction * opts.current.speed * deltaRatio
-    material.current.uniforms.speed.value = opts.current.speed * deltaRatio
+    material.current.uniforms.time.value += dt * opts.speed * 0.001
+    material.current.uniforms.dieSpeed.value = opts.dieSpeed * deltaRatio
+    material.current.uniforms.attraction.value = opts.attraction * opts.speed * deltaRatio
+    material.current.uniforms.speed.value = opts.speed * deltaRatio
     material.current.uniforms.initAnimation.value = Math.min(
       material.current.uniforms.initAnimation.value + dt * 0.00025, 1,
     )
@@ -148,8 +147,8 @@ const Move = (_props, ref) => {
         ref={material}
         uniforms={uniforms}
         uniforms-deltaDistance-value={deltaDistance}
-        uniforms-radius-value={opts.current.radius}
-        uniforms-curlSize-value={opts.current.curlSize}
+        uniforms-radius-value={opts.radius}
+        uniforms-curlSize-value={opts.curlSize}
         vertexShader={rawShaderPrefix + vertexShader}
         fragmentShader={rawShaderPrefix + fragmentShader}
         blending={NoBlending}

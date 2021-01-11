@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, forwardRef } from 'react'
+import { useRef, useEffect, useMemo } from 'react'
 import { useThree, useFrame, createPortal } from 'react-three-fiber'
 import {
   FogExp2,
@@ -18,9 +18,15 @@ import Additive from './renderTarget/additive'
 import BlurH from './renderTarget/blurH'
 import BlurV from './renderTarget/blurV'
 import Quad from './renderTarget/quad'
+import Screen from './renderTarget/screen'
+import Floor from './floor'
+import Effect from './postprocessing'
 
-const FakeBlobPage = (_props, ref) => {
-  const { opts } = ref
+interface Props {
+  opts: any
+}
+
+const FakeBlobPage = ({ opts }: Props) => {
   const { gl, scene, camera, size }: any = useThree()
 
   // scene
@@ -29,10 +35,13 @@ const FakeBlobPage = (_props, ref) => {
   const quadScene = useMemo(() => new Scene(), [])
   const blurScene = useMemo(() => new Scene(), [])
   const movementScene = useMemo(() => new Scene(), [])
+  const screenScene = useRef<THREE.Scene>()
+  screenScene.current = useMemo(() => new Scene(), [])
 
   // camera
   const quadCamera = useRef<THREE.OrthographicCamera>()
   const movementCamera = useRef<THREE.OrthographicCamera>()
+  const screenCamera = useRef<THREE.OrthographicCamera>()
 
   const fbohelper = useMemo(() => new FBOHelper(gl), [])
 
@@ -42,8 +51,8 @@ const FakeBlobPage = (_props, ref) => {
   movementRenderTarget.current = useMemo(
     () => {
       const renderTarget = new WebGLRenderTarget(
-        opts.current.width,
-        opts.current.height, {
+        opts.width,
+        opts.height, {
         wrapS: ClampToEdgeWrapping,
         wrapT: ClampToEdgeWrapping,
         minFilter: NearestFilter,
@@ -106,9 +115,25 @@ const FakeBlobPage = (_props, ref) => {
     [],
   )
 
+  const screenRenderTarget = useRef<THREE.WebGLRenderTarget>(null)
+  screenRenderTarget.current = useMemo(
+    () => {
+      const renderTarget = new WebGLRenderTarget(1, 1, {
+        minFilter: NearestFilter,
+        magFilter: NearestFilter,
+        format: RGBAFormat,
+        type: HalfFloatType,
+        stencilBuffer: false,
+      })
+      fbohelper.attach(renderTarget, 'screen')
+      return renderTarget
+    },
+    [],
+  )
+
   useFrame(() => {
-    const tmpColor = opts.current.floorColor
-    tmpColor.lerp(new Color(opts.current.bgColor), 0.05)
+    const tmpColor = opts.floorColor
+    tmpColor.lerp(new Color(opts.bgColor), 0.05)
     scene.fog.color.copy(tmpColor)
     gl.setClearColor(tmpColor.getHex())
 
@@ -117,7 +142,7 @@ const FakeBlobPage = (_props, ref) => {
 
     gl.autoClearColor = false
 
-    if (opts.current.speed || opts.current.dieSpeed) {
+    if (opts.speed || opts.dieSpeed) {
       gl.setRenderTarget(movementRenderTarget.current)
       gl.render(movementScene, movementCamera.current)
       gl.setRenderTarget(null)
@@ -135,7 +160,7 @@ const FakeBlobPage = (_props, ref) => {
     gl.render(additiveScene, camera)
     gl.setRenderTarget(null)
 
-    const blurRadius = opts.current.blur
+    const blurRadius = opts.blur
     if (blurRadius) {
       gl.setRenderTarget(blurRenderTarget.current)
       gl.clear()
@@ -148,15 +173,25 @@ const FakeBlobPage = (_props, ref) => {
       gl.setRenderTarget(null)
     }
 
+    gl.setRenderTarget(screenRenderTarget.current)
+    gl.clear()
     gl.setClearColor(clearColor, clearAlpha)
     gl.autoClearColor = true
-
     gl.render(scene, camera)
-
     gl.autoClearColor = false
     gl.render(quadScene, quadCamera.current)
+    gl.setRenderTarget(null)
 
-    gl.autoClearColor = true
+    // gl.setClearColor(clearColor, clearAlpha)
+    // gl.autoClearColor = true
+
+    // gl.render(scene, camera)
+
+    // gl.autoClearColor = false
+    // gl.render(quadScene, quadCamera.current)
+    gl.render(screenScene.current, screenCamera.current)
+
+    // gl.autoClearColor = true
     fbohelper.update()
   }, 1)
 
@@ -167,73 +202,79 @@ const FakeBlobPage = (_props, ref) => {
     depthRenderTarget.current.setSize(w, h)
     additiveRenderTarget.current.setSize(w, h)
     blurRenderTarget.current.setSize(w, h)
+    screenRenderTarget.current.setSize(w, h)
     fbohelper.setSize(w, h)
   }, [ size ])
 
   useEffect(() => {
-    // gl.setClearColor(opts.current.bgColor)
-    scene.fog = new FogExp2(opts.current.bgColor, 0.001)
+    // gl.setClearColor(opts.bgColor)
+    scene.fog = new FogExp2(opts.bgColor, 0.001)
     camera.position.set(300, 60, 300).normalize().multiplyScalar(500)
   }, [])
 
   const movementRef: any = {
     movementPrevRenderTarget,
     movementRenderTarget,
-    opts,
   }
   const depthRef: any = {
     movementPrevRenderTarget,
     movementRenderTarget,
-    opts,
   }
   const additiveRef: any = {
     movementRenderTarget,
     depthRenderTarget,
-    opts,
   }
   const blurHRef: any = {
     additiveRenderTarget,
-    opts,
   }
   const blurVRef: any = {
     blurRenderTarget,
-    opts,
   }
   const quadRef: any = {
     depthRenderTarget,
     additiveRenderTarget,
-    opts,
   }
+  const screenRef: any = {
+    renderTarget: screenRenderTarget,
+  }
+  const effectRef: any = { screenScene, screenCamera }
 
   return (
     <>
       <orthographicCamera ref={movementCamera} position-z={1} />
       {createPortal(
-        <Movement ref={movementRef} />,
+        <Movement ref={movementRef} opts={opts} />,
         movementScene,
       )}
       {createPortal(
-        <Depth ref={depthRef} />,
+        <Depth ref={depthRef} opts={opts} />,
         depthScene,
       )}
       {createPortal(
-        <Additive ref={additiveRef} />,
+        <Additive ref={additiveRef} opts={opts} />,
         additiveScene,
       )}
       {createPortal(
         <>
-          <BlurH ref={blurHRef} />
-          <BlurV ref={blurVRef} />
+          <BlurH ref={blurHRef} opts={opts} />
+          <BlurV ref={blurVRef} opts={opts} />
         </>,
         blurScene,
       )}
       <orthographicCamera ref={quadCamera} position-z={1} />
       {createPortal(
-        <Quad ref={quadRef} />,
+        <Quad ref={quadRef} opts={opts} />,
         quadScene,
       )}
+      <orthographicCamera ref={screenCamera} position-z={1} />
+      {createPortal(
+        <Screen ref={screenRef} />,
+        screenScene.current,
+      )}
+      <Floor color={opts.floorColor} />
+      <Effect ref={effectRef} opts={opts} />
     </>
   )
 }
 
-export default forwardRef(FakeBlobPage)
+export default FakeBlobPage

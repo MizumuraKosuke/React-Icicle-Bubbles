@@ -13,19 +13,17 @@ import frag from '../../shader/depth.frag'
 const vertexShader = glslify(vert)
 const fragmentShader = glslify(frag)
 
-const Depth = (_props, ref) => {
-  const {
-    movementPrevRenderTarget,
-    movementRenderTarget,
-    opts,
-  } = ref
+interface Props {
+  opts: any
+}
 
+const Depth = ({ opts }: Props, { movementPrevRenderTarget, movementRenderTarget }: any) => {
   const material = useRef<THREE.ShaderMaterial>(null)
   const points = useRef<THREE.Points>(null)
 
   const uniforms = useMemo(
     () => ({
-      uParticleSize : new Uniform(opts.current.particleSize),
+      uParticleSize : new Uniform(opts.particleSize),
       uTexturePosition: new Uniform(movementRenderTarget.current.texture),
       uTexturePrevPosition: new Uniform(null),
       uPrevModelViewMatrix: new Uniform(new Matrix4()),
@@ -34,11 +32,11 @@ const Depth = (_props, ref) => {
   )
 
   const position = useMemo(() => {
-    const pos = new Float32Array(opts.current.amount * 3)
-    for(let i = 0; i < opts.current.amount; i++ ) {
+    const pos = new Float32Array(opts.amount * 3)
+    for(let i = 0; i < opts.amount; i++ ) {
       const i3 = i * 3
-      pos[i3 + 0] = ((i % opts.current.width) + 0.5) / opts.current.width
-      pos[i3 + 1] = ((~~(i / opts.current.width)) + 0.5) / opts.current.height
+      pos[i3 + 0] = ((i % opts.width) + 0.5) / opts.width
+      pos[i3 + 1] = ((~~(i / opts.width)) + 0.5) / opts.height
       pos[i3 + 2] = 400 + Math.pow(Math.random(), 5) * 750
     }
     return pos
@@ -49,7 +47,7 @@ const Depth = (_props, ref) => {
     movementPrevRenderTarget.current.texture
     material.current.uniforms.uTexturePosition.value = movementRenderTarget.current.texture
 
-    const skipMatrixUpdate = !(opts.current.dieSpeed || opts.current.speed) && opts.current.motionBlur
+    const skipMatrixUpdate = !(opts.dieSpeed || opts.speed) && opts.motionBlur
     if(!skipMatrixUpdate) {
       material.current.uniforms.uPrevModelViewMatrix.value.copy(points.current.modelViewMatrix)
     }
@@ -73,7 +71,7 @@ const Depth = (_props, ref) => {
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
-        uniforms-uParticleSize-value={opts.current.particleSize}
+        uniforms-uParticleSize-value={opts.particleSize}
         blending={NoBlending}
         transparent
       />

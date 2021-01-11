@@ -12,11 +12,11 @@ import frag from '../../shader/blurH.frag'
 const vertexShader = glslify(vert)
 const fragmentShader = glslify(frag)
 
-const BlurH = (_props, ref) => {
-  const {
-    additiveRenderTarget,
-    opts,
-  } = ref
+interface Props {
+  opts: any
+}
+
+const BlurH = ({ opts }: Props, { additiveRenderTarget }: any) => {
   const material = useRef<THREE.ShaderMaterial>(null)
 
   const { size } = useThree()
@@ -26,21 +26,21 @@ const BlurH = (_props, ref) => {
       tDiffuse : new Uniform(additiveRenderTarget.current.texture),
       uResolution : new Uniform(new Vector2()),
       uOffset : new Uniform(0),
-      uBlurZ : new Uniform(opts.current.blurZ),
+      uBlurZ : new Uniform(opts.blurZ),
     }),
     [],
   )
 
   useFrame(() => {
-    const blurRadius = opts.current.blur
+    const blurRadius = opts.blur
     if (!blurRadius) {
       return
     }
 
     material.current.uniforms.uOffset.value +=
-      (blurRadius / opts.current.width - material.current.uniforms.uOffset.value) * 0.05
+      (blurRadius / opts.width - material.current.uniforms.uOffset.value) * 0.05
     material.current.uniforms.uBlurZ.value +=
-    (opts.current.blurZ - material.current.uniforms.uBlurZ.value) * 0.05
+    (opts.blurZ - material.current.uniforms.uBlurZ.value) * 0.05
     material.current.uniforms.tDiffuse.value = additiveRenderTarget.current.texture
   })
 

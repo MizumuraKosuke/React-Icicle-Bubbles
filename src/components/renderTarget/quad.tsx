@@ -13,12 +13,11 @@ import frag from '../../shader/particles.frag'
 const vertexShader = glslify(vert)
 const fragmentShader = glslify(frag)
 
-const Quad = (_props, ref) => {
-  const {
-    depthRenderTarget,
-    additiveRenderTarget,
-    opts,
-  } = ref
+interface Props {
+  opts: any
+}
+
+const Quad = ({ opts }: Props, { depthRenderTarget, additiveRenderTarget }: any) => {
   const material = useRef<THREE.ShaderMaterial>(null)
 
   const { gl, size } = useThree()
@@ -26,10 +25,10 @@ const Quad = (_props, ref) => {
   const tex = useMemo(
     () => {
       let src = '/images/matcap.jpg'
-      if (opts.current.matcap === 'metal') {
+      if (opts.matcap === 'metal') {
         src = '/images/matcap_metal.jpg'
       }
-      else if (opts.current.matcap === 'plastic') {
+      else if (opts.matcap === 'plastic') {
         src = '/images/matcap_plastic.jpg'
       }
       const sphereTexture = new TextureLoader().load(src, (texture) => {
@@ -41,12 +40,12 @@ const Quad = (_props, ref) => {
       })
       return sphereTexture
     },
-    [ opts.current.matcap ],
+    [ opts.matcap ],
   )
 
   const uniforms = useMemo(
     () => ({
-      uInset: new Uniform(opts.current.inset),
+      uInset: new Uniform(opts.inset),
       uWashout: new Uniform(0),
       uDepth : new Uniform(depthRenderTarget.current.texture),
       uAdditive : new Uniform(additiveRenderTarget.current.texture),
@@ -58,7 +57,7 @@ const Quad = (_props, ref) => {
 
   useFrame(() => {
     material.current.uniforms.uWashout.value +=
-    (opts.current.washout - material.current.uniforms.uWashout.value) * 0.05
+    (opts.washout - material.current.uniforms.uWashout.value) * 0.05
     material.current.uniforms.uDepth.value = depthRenderTarget.current.texture
     material.current.uniforms.uAdditive.value = additiveRenderTarget.current.texture
   })
@@ -78,7 +77,7 @@ const Quad = (_props, ref) => {
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
-        uniforms-uInset-value={opts.current.inset}
+        uniforms-uInset-value={opts.inset}
         transparent
         depthWrite={false}
       />

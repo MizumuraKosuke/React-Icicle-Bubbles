@@ -15,34 +15,32 @@ import frag from '../../shader/additive.frag'
 const vertexShader = glslify(vert)
 const fragmentShader = glslify(frag)
 
-const Additive = (_props, ref) => {
-  const {
-    movementRenderTarget,
-    depthRenderTarget,
-    opts,
-  } = ref
+interface Props {
+  opts: any
+}
 
+const Additive = ({ opts }: Props, { movementRenderTarget, depthRenderTarget }: any) => {
   const material = useRef<THREE.ShaderMaterial>(null)
 
   const { size } = useThree()
 
   const uniforms = useMemo(
     () => ({
-      uParticleSize : new Uniform(opts.current.particleSize),
+      uParticleSize : new Uniform(opts.particleSize),
       uTexturePosition: new Uniform(movementRenderTarget.current.texture),
       uDepth: new Uniform(depthRenderTarget.current.texture),
-      uInset: new Uniform(opts.current.inset),
+      uInset: new Uniform(opts.inset),
       uResolution: new Uniform(new Vector2()),
     }),
     [],
   )
 
   const position = useMemo(() => {
-    const pos = new Float32Array(opts.current.amount * 3)
-    for(let i = 0; i < opts.current.amount; i++ ) {
+    const pos = new Float32Array(opts.amount * 3)
+    for(let i = 0; i < opts.amount; i++ ) {
       const i3 = i * 3
-      pos[i3 + 0] = ((i % opts.current.width) + 0.5) / opts.current.width
-      pos[i3 + 1] = ((~~(i / opts.current.width)) + 0.5) / opts.current.height
+      pos[i3 + 0] = ((i % opts.width) + 0.5) / opts.width
+      pos[i3 + 1] = ((~~(i / opts.width)) + 0.5) / opts.height
       pos[i3 + 2] = 400 + Math.pow(Math.random(), 5) * 750
     }
     return pos
@@ -77,8 +75,8 @@ const Additive = (_props, ref) => {
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
-        uniforms-uParticleSize-value={opts.current.particleSize}
-        uniforms-uInset-value={opts.current.inset}
+        uniforms-uParticleSize-value={opts.particleSize}
+        uniforms-uInset-value={opts.inset}
         blending={CustomBlending}
         blendEquation={AddEquation}
         blendSrc={OneFactor}
