@@ -182,16 +182,8 @@ const FakeBlobPage = ({ opts }: Props) => {
     gl.render(quadScene, quadCamera.current)
     gl.setRenderTarget(null)
 
-    // gl.setClearColor(clearColor, clearAlpha)
-    // gl.autoClearColor = true
-
-    // gl.render(scene, camera)
-
-    // gl.autoClearColor = false
-    // gl.render(quadScene, quadCamera.current)
     gl.render(screenScene.current, screenCamera.current)
 
-    // gl.autoClearColor = true
     fbohelper.update()
   }, 1)
 
@@ -207,7 +199,6 @@ const FakeBlobPage = ({ opts }: Props) => {
   }, [ size ])
 
   useEffect(() => {
-    // gl.setClearColor(opts.bgColor)
     scene.fog = new FogExp2(opts.bgColor, 0.001)
     camera.position.set(300, 60, 300).normalize().multiplyScalar(500)
   }, [])
