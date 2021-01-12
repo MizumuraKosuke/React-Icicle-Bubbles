@@ -52,7 +52,7 @@ const Quad = ({ opts }: Props, { depthRenderTarget, additiveRenderTarget }: any)
       uSphereMap : new Uniform(tex),
       uResolution: new Uniform(new Vector2()),
     }),
-    [ tex ],
+    [],
   )
 
   useFrame(() => {
@@ -78,6 +78,7 @@ const Quad = ({ opts }: Props, { depthRenderTarget, additiveRenderTarget }: any)
         fragmentShader={fragmentShader}
         uniforms={uniforms}
         uniforms-uInset-value={opts.inset}
+        uniforms-uSphereMap-value={tex}
         transparent
         depthWrite={false}
       />
