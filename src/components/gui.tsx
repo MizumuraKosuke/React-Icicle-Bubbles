@@ -6,7 +6,7 @@ interface Props {
   opts: {
 
   },
-  setOpts: (opts: any) => void
+  setOpts: any
 }
 
 const GUI = ({ opts, setOpts }: Props) => (

@@ -51,7 +51,7 @@ const initialOpts: any = {
   // bloomRadius: 1,
   bloomIntensity: 0.3,
   vignette: false,
-  floorColor: new Color('#fff')
+  floorColor: new Color('#fff'),
 }
 
 const Home = () => {

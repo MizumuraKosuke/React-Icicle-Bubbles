@@ -53,15 +53,15 @@ const FakeBlobPage = ({ opts }: Props) => {
       const renderTarget = new WebGLRenderTarget(
         opts.width,
         opts.height, {
-        wrapS: ClampToEdgeWrapping,
-        wrapT: ClampToEdgeWrapping,
-        minFilter: NearestFilter,
-        magFilter: NearestFilter,
-        format: RGBAFormat,
-        type: HalfFloatType,
-        depthBuffer: false,
-        stencilBuffer: false,
-      })
+          wrapS: ClampToEdgeWrapping,
+          wrapT: ClampToEdgeWrapping,
+          minFilter: NearestFilter,
+          magFilter: NearestFilter,
+          format: RGBAFormat,
+          type: HalfFloatType,
+          depthBuffer: false,
+          stencilBuffer: false,
+        })
       fbohelper.attach(renderTarget, 'movement')
       movementPrevRenderTarget.current = renderTarget.clone()
       return renderTarget
